@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Query, Body, APIRouter
 import uvicorn
-
+from pydantic import BaseModel
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
 
@@ -9,6 +9,11 @@ hotels = [
     {"id": 1, "title": "Sochi", "name": "Sochi"},
     {"id": 2, "title": "Дубай", "name": "Dubai"}
 ]
+
+
+class Hotel(BaseModel):
+    title: str
+    name: str
 
 
 #Параметры запроса
@@ -36,31 +41,23 @@ def delete_hotel(hotel_id: int):
 
 
 @router.post("")
-def add_hotel(
-        title: str = Body(embed=True),
-        name: str = Body(embed=True)
-
-):
+def add_hotel(hotel_data: Hotel):
     global hotels
     hotels.append(
         {"id": hotels[-1]["id"] + 1,
-         "title": title,
-         "name": name}
+         "title": hotel_data.title,
+         "name": hotel_data.name}
     )
     return {"Status": "OK"}
 
 
 @router.put("/{hotel_id}")
-def put_hotel(
-        hotel_id : int,
-        title: str = Body(embed=True),
-        name: str = Body(embed=True)
-):
+def put_hotel(hotel_id : int, hotels_data: Hotel):
     global hotels
     for hotel in hotels:
         if hotel["id"] == hotel_id:
-            hotel["title"] = title
-            hotel["name"] = name
+            hotel["title"] = hotels_data.title
+            hotel["name"] = hotels_data.name
     return {"Status": "OK"}
 
 
