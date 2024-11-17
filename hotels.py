@@ -7,7 +7,12 @@ router = APIRouter(prefix="/hotels", tags=["Отели"])
 
 hotels = [
     {"id": 1, "title": "Sochi", "name": "Sochi"},
-    {"id": 2, "title": "Дубай", "name": "Dubai"}
+    {"id": 2, "title": "Дубай", "name": "Dubai"},
+    {"id": 3, "title": "Мальдивы", "name": "maldivi"},
+    {"id": 4, "title": "Геленджик", "name": "gelendzhik"},
+    {"id": 5, "title": "Москва", "name": "moscow"},
+    {"id": 6, "title": "Казань", "name": "kazan"},
+    {"id": 7, "title": "Санкт-Петербург", "name": "spb"},
 ]
 
 
@@ -15,10 +20,18 @@ hotels = [
 @router.get("")
 def get_hotels(
         id: int | None = Query(None, description="Айдишник"),
-        title: str | None = Query(None, description="Название отеля")
+        title: str | None = Query(None, description="Название отеля"),
+        page: int = Query(1, description="Страница"),
+        per_page: int = Query(3, description="Количество отелей")
 ):
+    global hotels
     hotels_ = []
-    for hotel in hotels:
+
+    start_index = (page - 1) * per_page
+    end_index = start_index + per_page
+    paginated_hotels = hotels[start_index:end_index]
+
+    for hotel in paginated_hotels:
         if id and hotel["id"] != id:
             continue
         if title and hotel["title"] != title:
