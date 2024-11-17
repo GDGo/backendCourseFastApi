@@ -21,22 +21,21 @@ hotels = [
 def get_hotels(
         id: int | None = Query(None, description="Айдишник"),
         title: str | None = Query(None, description="Название отеля"),
-        page: int = Query(1, description="Страница"),
-        per_page: int = Query(3, description="Количество отелей")
+        page: int = Query(None, description="Страница", ge=1),
+        per_page: int = Query(None, description="Количество отелей", ge=1, le=30)
 ):
     global hotels
     hotels_ = []
 
-    start_index = (page - 1) * per_page
-    end_index = start_index + per_page
-    paginated_hotels = hotels[start_index:end_index]
-
-    for hotel in paginated_hotels:
+    for hotel in hotels:
         if id and hotel["id"] != id:
             continue
         if title and hotel["title"] != title:
             continue
         hotels_.append(hotel)
+
+    if page and per_page:
+        return hotels_[per_page * (page - 1):][:per_page]
     return hotels_
 
 
