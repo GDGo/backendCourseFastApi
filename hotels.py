@@ -1,6 +1,6 @@
-from fastapi import FastAPI, Query, Body, APIRouter
-import uvicorn
-from pydantic import BaseModel
+from fastapi import Query, APIRouter, Body
+from schemas.hotels import Hotel, HotelPatch
+
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
 
@@ -9,11 +9,6 @@ hotels = [
     {"id": 1, "title": "Sochi", "name": "Sochi"},
     {"id": 2, "title": "Дубай", "name": "Dubai"}
 ]
-
-
-class Hotel(BaseModel):
-    title: str
-    name: str
 
 
 #Параметры запроса
@@ -41,7 +36,17 @@ def delete_hotel(hotel_id: int):
 
 
 @router.post("")
-def add_hotel(hotel_data: Hotel):
+def add_hotel(hotel_data: Hotel = Body(openapi_examples={
+    "1": {"summary": "Сочи", "value": {
+        "title": "Отель Сочи 5 звезд у моря",
+        "name": "sochi_u_morya"
+    }},
+    "2": {"summary": "Дубай", "value": {
+        "title": "Отель Дубай у фонтана",
+        "name": "dubai_u_fontan"
+    }},
+})
+):
     global hotels
     hotels.append(
         {"id": hotels[-1]["id"] + 1,
@@ -58,19 +63,16 @@ def put_hotel(hotel_id : int, hotels_data: Hotel):
         if hotel["id"] == hotel_id:
             hotel["title"] = hotels_data.title
             hotel["name"] = hotels_data.name
+            break
     return {"Status": "OK"}
 
 
 @router.patch("/{hotel_id}")
-def patch_hotel(
-        hotel_id : int,
-        title: str | None = Body(None, embed=True),
-        name: str | None = Body(None, embed=True)
-):
+def patch_hotel(hotel_id : int, hotel_data: HotelPatch):
     global hotels
-    for hotel in hotels:
-        if name:
-            hotel["title"] = title
-        if title:
-            hotel["name"] = name
+    hotel = [hotel for hotel in hotels if hotel["id"] == hotel_id][0]
+    if hotel_data.name:
+        hotel["title"] = hotel_data.title
+    if hotel_data.title:
+        hotel["name"] = hotel_data.name
     return {"Status": "OK"}
