@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from pathlib import Path
 import uvicorn
 import sys
 from pathlib import Path
