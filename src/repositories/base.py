@@ -1,4 +1,4 @@
-from sqlalchemy import select, insert, literal_column
+from sqlalchemy import select, insert
 
 
 class BaseRepository:
