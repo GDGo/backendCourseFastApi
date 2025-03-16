@@ -15,16 +15,16 @@ router = APIRouter(prefix="/hotels", tags=["Отели"])
 @router.get("")
 async def get_hotels(
         pagination: PaginationDep,
-        id: int | None = Query(None, description="Айдишник"),
+        location: str | None = Query(None, description="Адрес"),
         title: str | None = Query(None, description="Название отеля")
 ):
     per_page = pagination.per_page or 5
     async with async_session_maker() as session:
         query = select(HotelsOrm)
-        if id:
-            query = query.filter_by(id=id)
+        if location:
+            query = query.filter(HotelsOrm.location.ilike(f"%{location}%"))
         if title:
-            query = query.filter_by(title=title)
+            query = query.filter(HotelsOrm.title.ilike(f"%{title}%"))
         query = (
             query
             .limit(per_page)
@@ -46,12 +46,28 @@ def delete_hotel(hotel_id: int):
 @router.post("")
 async def add_hotel(hotel_data: Hotel = Body(openapi_examples={
     "1": {"summary": "Сочи", "value": {
-        "title": "Отель Сочи 5 звезд у моря",
-        "location": "ул. Моря, 1"
+        "title": "Адмирал 3",
+        "location": "Сочи, ул. Нижнеимеретинская, 139А"
     }},
     "2": {"summary": "Дубай", "value": {
-        "title": "Отель Дубай у фонтана",
-        "location": "ул. Шейха, 1"
+        "title": "Отель у фонтана",
+        "location": "Дубай, ул. Шейха, 1"
+    }},
+    "3": {"summary": "Адлер-Коралл", "value": {
+        "title": "Коралл",
+        "location": "Адлер, улица Ленина, 219"
+    }},
+    "4": {"summary": "Адлер-Дельфин", "value": {
+        "title": "Дельфин",
+        "location": "Адлер, улица Ленина, 219а к2"
+    }},
+    "5": {"summary": "Адлер-Нептун", "value": {
+        "title": "Нептун",
+        "location": "Адлер, ул. Ленина, 219 к4"
+    }},
+    "6": {"summary": "Джубга", "value": {
+        "title": "Гостиночно-ресторанный комплекс Grand Paradise",
+        "location": "п. Джубгское, мкр. Прибой, 3 «А»"
     }},
     })
 ):
