@@ -1,4 +1,4 @@
-from fastapi import Query, APIRouter, Body
+from fastapi import Query, APIRouter, Body, Path
 from src.database import async_session_maker
 from src.repositories.hotels import HotelsRepository
 from src.schemas.hotels import Hotel, HotelPatch
@@ -23,6 +23,12 @@ async def get_hotels(
             limit=pagination.per_page or 5,
             offset=per_page * (pagination.page - 1)
         )
+
+
+@router.get("/{hotel_id}")
+async def get_hotel(hotel_id: int = Path(description="ID отеля")):
+    async with async_session_maker() as session:
+        return await HotelsRepository(session).get_one_or_none(id=hotel_id)
 
 
 #Параметр пути
