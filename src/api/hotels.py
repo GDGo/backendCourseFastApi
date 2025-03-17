@@ -26,13 +26,6 @@ async def get_hotels(
 
 
 #Параметр пути
-@router.delete("/{hotel_id}")
-def delete_hotel(hotel_id: int):
-    global hotels
-    hotels = [hotel for hotel in hotels if hotel["id"] != hotel_id]
-    return {"status": "OK"}
-
-
 @router.post("")
 async def add_hotel(hotel_data: Hotel = Body(openapi_examples={
     "1": {"summary": "Сочи", "value": {
@@ -68,14 +61,19 @@ async def add_hotel(hotel_data: Hotel = Body(openapi_examples={
 
 
 @router.put("/{hotel_id}")
-def put_hotel(hotel_id : int, hotels_data: Hotel):
-    global hotels
-    for hotel in hotels:
-        if hotel["id"] == hotel_id:
-            hotel["title"] = hotels_data.title
-            hotel["name"] = hotels_data.name
-            break
+async def put_hotel(hotel_id : int, hotels_data: Hotel):
+    async with async_session_maker() as session:
+        await HotelsRepository(session).edit(hotels_data, id=hotel_id)
+        await session.commit()
     return {"Status": "OK"}
+
+
+@router.delete("/{hotel_id}")
+async def delete_hotel(hotel_id: int):
+    async with async_session_maker() as session:
+        await HotelsRepository(session).delete(id=hotel_id)
+        await session.commit()
+    return {"status": "OK"}
 
 
 @router.patch("/{hotel_id}")
