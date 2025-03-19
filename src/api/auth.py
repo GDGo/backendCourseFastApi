@@ -41,5 +41,11 @@ async def register_user(
 async def only_auth(
         request: Request
 ):
-    access_token = request.cookies["access_token"]
-    return {"access_token": access_token}
+    access_token = request.cookies.get("access_token")
+    if not access_token:
+        raise HTTPException(status_code=400, detail="token not valid.")
+    data = AuthService().token_decode(access_token)
+    user_id = data.get("user_id")
+    async with async_session_maker() as session:
+        user_data = await UsersRepository(session).get_one_or_none(id=user_id)
+        return user_data
