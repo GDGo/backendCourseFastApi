@@ -17,7 +17,7 @@ class Settings(BaseSettings):
 
     JWT_SECRET_KEY: str
     JWT_ALGORITHM: str
-    ACCESS_TOKEN_EXPIRE_MINUTES: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int
 
     # model_config = SettingsConfigDict(env_file=f"{Path(__file__).parent.parent / '.env'}")
     model_config = SettingsConfigDict(

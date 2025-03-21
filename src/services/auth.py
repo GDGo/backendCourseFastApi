@@ -12,7 +12,7 @@ class AuthService:
 
     def create_access_token(self, data: dict) -> str:
         to_encode = data.copy()
-        expire = datetime.now(timezone.utc) + timedelta(minutes=30)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         to_encode.update({"exp": expire})
         encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
         return encoded_jwt
@@ -29,4 +29,4 @@ class AuthService:
         except jwt.exceptions.DecodeError:
             raise HTTPException(status_code=401, detail="Не верный токен")
         except jwt.exceptions.ExpiredSignatureError:
-            raise HTTPException(status_code=401, detail="Не верный токен")
+            raise HTTPException(status_code=401, detail="Время действия токена закончилось")

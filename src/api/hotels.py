@@ -79,7 +79,8 @@ async def add_hotel(
 @router.put("/{hotel_id}")
 async def put_hotel(
         user: UserIdDep,
-        hotel_id : int, hotel_data: HotelAdd
+        hotel_id : int,
+        hotel_data: HotelAdd
 ):
     async with async_session_maker() as session:
         await HotelsRepository(session).edit(hotel_data, id=hotel_id)
