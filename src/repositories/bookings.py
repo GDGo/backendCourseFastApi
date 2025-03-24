@@ -1,8 +1,4 @@
-from sqlalchemy import select
-
 from src.models.bookings import BookingsOrm
-from src.models.rooms import RoomsOrm
-from src.schemas.rooms import Room
 from src.repositories.base import BaseRepository
 from src.schemas.bookings import Booking
 
