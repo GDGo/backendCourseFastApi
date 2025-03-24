@@ -2,7 +2,6 @@ from typing import List
 
 from src.models.hotels import HotelsOrm
 from src.repositories.base import BaseRepository
-from sqlalchemy import select
 
 from src.schemas.hotels import Hotel
 

@@ -24,7 +24,8 @@ async def get_room(
         user: UserIdDep,
         db: DBDep,
         hotel_id: int,
-        room_id: int):
+        room_id: int
+):
     return await db.rooms.get_one_or_none(id=room_id, hotel_id=hotel_id)
 
 
