@@ -27,11 +27,12 @@ async def add_booking(
     }},
     })
 ):
-    price = await db.bookings.get_price(id=booking_data.room_id)
+    room = await db.rooms.get_one_or_none(id=booking_data.room_id)
+    room_price = room.price
     _booking_data = BookingAdd(
         user_id=user_id,
         **booking_data.model_dump(),
-        price=price
+        price=room_price
     )
     booking = await db.bookings.add(_booking_data)
     await db.commit()
