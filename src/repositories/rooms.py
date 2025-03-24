@@ -1,7 +1,3 @@
-from typing import List
-
-from sqlalchemy import select
-
 from src.models.rooms import RoomsOrm
 from src.repositories.base import BaseRepository
 from src.schemas.rooms import Room

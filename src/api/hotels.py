@@ -3,6 +3,7 @@ from fastapi import Query, APIRouter, Body, Path
 from src.schemas.hotels import HotelAdd, HotelPatch
 from src.api.dependencies import PaginationDep, UserIdDep, DBDep
 
+
 router = APIRouter(
     prefix="/hotels",
     tags=["Отели"],
