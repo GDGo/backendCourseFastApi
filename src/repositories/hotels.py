@@ -2,6 +2,7 @@ from datetime import date
 from typing import List
 from sqlalchemy import select
 
+from src.database import engine
 from src.models.hotels import HotelsOrm
 from src.models.rooms import RoomsOrm
 from src.repositories.base import BaseRepository
@@ -36,15 +37,39 @@ class HotelsRepository(BaseRepository):
 
     async def get_filtered_by_time(
             self,
+            location,
+            title,
+            limit,
+            offset,
             date_to: date,
             date_from: date,
     ):
         rooms_ids = rooms_ids_for_booking(date_to, date_from)
 
+        hotels_ids_filter_loc_title = (
+            select(HotelsOrm.id)
+            .select_from(HotelsOrm)
+        )
+        if location:
+            hotels_ids_filter_loc_title = (hotels_ids_filter_loc_title
+                     .filter(HotelsOrm.location.ilike(f"%{location.strip()}%")))
+        if title:
+            hotels_ids_filter_loc_title = (hotels_ids_filter_loc_title
+                     .filter(HotelsOrm.title.ilike(f"%{title.strip()}%")))
+        hotels_ids_filter_loc_title = (
+            hotels_ids_filter_loc_title
+            .limit(limit)
+            .offset(offset)
+        )
+
         hotels_ids = (
             select(RoomsOrm.hotel_id)
             .select_from(RoomsOrm)
-            .filter(RoomsOrm.id.in_(rooms_ids))
+            .filter(
+                RoomsOrm.id.in_(rooms_ids),
+                RoomsOrm.hotel_id.in_(hotels_ids_filter_loc_title))
         )
+
+        # print(hotels_ids.compile(bind=engine, compile_kwargs={"literal_binds": True}))
 
         return await self.get_filtered(HotelsOrm.id.in_(hotels_ids))
