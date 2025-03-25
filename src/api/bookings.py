@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, HTTPException
 
 from src.api.dependencies import DBDep, UserIdDep
 from src.schemas.bookings import BookingAdd, BookingAddRequest
@@ -8,6 +8,21 @@ router = APIRouter(
     prefix="/bookings",
     tags=["Бронирование"]
 )
+
+
+@router.get("")
+async def get_all_bookings(
+        db: DBDep,
+):
+    return await db.bookings.get_all()
+
+
+@router.get("/me")
+async def get_my_bookings(
+        user_id: UserIdDep,
+        db: DBDep,
+):
+    return await db.bookings.get_filtered(user_id=user_id)
 
 
 @router.post("")
@@ -28,6 +43,8 @@ async def add_booking(
     })
 ):
     room = await db.rooms.get_one_or_none(id=booking_data.room_id)
+    if room is None:
+        raise HTTPException(404, detail="Номер не найден")
     room_price = room.price
     _booking_data = BookingAdd(
         user_id=user_id,
@@ -37,25 +54,3 @@ async def add_booking(
     booking = await db.bookings.add(_booking_data)
     await db.commit()
     return {"status": "OK", "data":booking}
-
-
-@router.get("")
-async def get_all_bookings(
-        db: DBDep,
-):
-    return await db.bookings.get_all()
-
-
-@router.get("/me")
-async def get_me_bookings(
-        user_id: UserIdDep,
-        db: DBDep,
-):
-    return await db.bookings.get_filtered(user_id=user_id)
-
-
-
-
-
-
-
