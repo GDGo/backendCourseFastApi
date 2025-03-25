@@ -43,33 +43,30 @@ class HotelsRepository(BaseRepository):
             offset,
             date_to: date,
             date_from: date,
-    ):
+    ) -> List[Hotel]:
         rooms_ids = rooms_ids_for_booking(date_to, date_from)
-
-        hotels_ids_filter_loc_title = (
-            select(HotelsOrm.id)
-            .select_from(HotelsOrm)
-        )
-        if location:
-            hotels_ids_filter_loc_title = (hotels_ids_filter_loc_title
-                     .filter(HotelsOrm.location.ilike(f"%{location.strip()}%")))
-        if title:
-            hotels_ids_filter_loc_title = (hotels_ids_filter_loc_title
-                     .filter(HotelsOrm.title.ilike(f"%{title.strip()}%")))
-        hotels_ids_filter_loc_title = (
-            hotels_ids_filter_loc_title
-            .limit(limit)
-            .offset(offset)
-        )
 
         hotels_ids = (
             select(RoomsOrm.hotel_id)
             .select_from(RoomsOrm)
-            .filter(
-                RoomsOrm.id.in_(rooms_ids),
-                RoomsOrm.hotel_id.in_(hotels_ids_filter_loc_title))
+            .filter(RoomsOrm.id.in_(rooms_ids)))
+
+        query = (
+            select(HotelsOrm)
+            .select_from(HotelsOrm)
+            .filter(HotelsOrm.id.in_(hotels_ids))
+        )
+        if location:
+            query = (query.filter(HotelsOrm.location.ilike(f"%{location.strip()}%")))
+        if title:
+            query = (query.filter(HotelsOrm.title.ilike(f"%{title.strip()}%")))
+        query = (
+            query
+            .limit(limit)
+            .offset(offset)
         )
 
+        result = await self.session.execute(query)
         # print(hotels_ids.compile(bind=engine, compile_kwargs={"literal_binds": True}))
 
-        return await self.get_filtered(HotelsOrm.id.in_(hotels_ids))
+        return [self.schema.model_validate(model, from_attributes=True) for model in result.scalars().all()]
