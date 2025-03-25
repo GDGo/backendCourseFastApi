@@ -22,8 +22,8 @@ class RoomsRepository(BaseRepository):
             select(BookingsOrm.room_id, func.count("*").label("rooms_booked"))
             .select_from(BookingsOrm)
             .filter(
-                BookingsOrm.date_to <= date_from,
-                BookingsOrm.date_from >= date_to
+                BookingsOrm.date_from <= date_to,
+                BookingsOrm.date_to >= date_from
             )
             .group_by(BookingsOrm.room_id)
             .cte(name="rooms_count")
@@ -55,4 +55,5 @@ class RoomsRepository(BaseRepository):
             )
         )
 
+        print(rooms_ids_to_get.compile(bind=engine, compile_kwargs={"literal_binds": True}))
         return await self.get_filtered(RoomsOrm.id.in_(rooms_ids_to_get))
