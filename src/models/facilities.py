@@ -7,7 +7,7 @@ from sqlalchemy.testing.schema import mapped_column
 from src.database import Base
 
 
-class Facilities(Base):
+class FacilitiesOrm(Base):
     __tablename__ = "facilities"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -15,7 +15,7 @@ class Facilities(Base):
 
 
 
-class RoomFacilities(Base):
+class RoomFacilitiesOrm(Base):
     __tablename__ = "rooms_facilities"
 
     id: Mapped[int] = mapped_column(primary_key=True)
