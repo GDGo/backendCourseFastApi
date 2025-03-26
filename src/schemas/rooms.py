@@ -1,3 +1,5 @@
+from typing import List
+
 from pydantic import BaseModel, Field
 
 
@@ -6,6 +8,7 @@ class RoomAddRequest(BaseModel):
     description: str | None = Field(None)
     price: int
     quantity: int
+    facilities_ids: List[int] | None = Field(None)
 
 
 class RoomAdd(BaseModel):
