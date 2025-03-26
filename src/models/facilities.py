@@ -1,6 +1,4 @@
-from tokenize import String
-
-from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.testing.schema import mapped_column
 
@@ -13,6 +11,10 @@ class FacilitiesOrm(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(String(100))
 
+    rooms: Mapped[list["RoomsOrm"]] = relationship(
+        back_populates="facilities",
+        secondary="rooms_facilities"
+    )
 
 
 class RoomFacilitiesOrm(Base):

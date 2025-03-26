@@ -2,6 +2,9 @@ from typing import List
 
 from pydantic import BaseModel, Field
 
+from src.models.rooms import RoomsOrm
+from src.schemas.facilities import Facility
+
 
 class RoomAddRequest(BaseModel):
     title: str
@@ -21,6 +24,10 @@ class RoomAdd(BaseModel):
 
 class Room(RoomAdd):
     id: int
+
+
+class RoomWithRels(Room):
+    facilities: list[Facility]
 
 
 class RoomPatchRequest(BaseModel):
