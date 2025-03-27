@@ -2,7 +2,6 @@ from typing import List
 
 from pydantic import BaseModel, Field
 
-from src.models.rooms import RoomsOrm
 from src.schemas.facilities import Facility
 
 
