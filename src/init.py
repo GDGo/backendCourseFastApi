@@ -4,5 +4,5 @@ from src.config import settings
 
 redis_manager = RedisManager(
     host=settings.REDIS_HOST,
-    port=settings.DB_PORT
+    port=settings.REDIS_PORT
 )

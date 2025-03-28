@@ -26,7 +26,7 @@ class RedisManager:
             print(f"Ошибка подключения к Redis: {e}")
             raise
 
-    async def set(self, key: str, value: Any, expire: Optional[int] = None) -> bool:
+    async def set(self, key: str, value: Any, expire: int = None) -> bool:
         """
         Установка значения по ключу.
 
