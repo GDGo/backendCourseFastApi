@@ -31,7 +31,6 @@ async def get_facilities(
     # else:
     #     facilities_dict = json.loads(facilities_from_cache)
     #     return facilities_dict
-    print("Зпрос в БД")
     return await db.facilities.get_all()
 
 
