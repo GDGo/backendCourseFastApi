@@ -34,7 +34,7 @@ class HotelsRepository(BaseRepository):
             .offset(offset)
         )
         result = await self.session.execute(query)
-        return [self.schema.model_validate(model, from_attributes=True) for model in result.scalars().all()]
+        return [HotelDataMapper.map_to_domain_entity(model) for model in result.scalars().all()]
 
     async def get_filtered_by_time(
             self,

@@ -37,7 +37,6 @@ async def logout_user(
 
 @router.post("/register")
 async def register_user(
-        user: UserIdDep,
         db: DBDep,
         data: UserRequestAdd
 ):
