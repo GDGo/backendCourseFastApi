@@ -6,7 +6,7 @@ def test_decode_and_encode_access_token():
     jwt_token = AuthService().create_access_token(data)
 
     assert jwt_token
-    assert isinstance(jwt_token, int)
+    assert isinstance(jwt_token, str)
 
     payload = AuthService().token_decode(jwt_token)
     assert payload
