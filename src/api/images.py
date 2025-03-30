@@ -1,6 +1,9 @@
 import shutil
-from fastapi import APIRouter, UploadFile
+from typing import Annotated
 
+from fastapi import APIRouter, UploadFile, Depends
+
+from src.api.dependencies import UserIdDep
 from src.tasks.tasks import compress_and_save_image
 
 
@@ -11,7 +14,10 @@ router = APIRouter(
 
 
 @router.post("")
-def upload_file(file: UploadFile):
+def upload_file(
+        file: UploadFile,
+        user_id: UserIdDep
+):
     image_path = f"src\static\images\\{file.filename}"
     with open(image_path, "wb+") as new_file:
         shutil.copyfileobj(file.file, new_file)

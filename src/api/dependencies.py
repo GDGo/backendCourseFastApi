@@ -21,7 +21,7 @@ def get_token(request: Request) -> str:
     if not token:
         token = request.headers.get("Authorization")
         if not token:
-            raise HTTPException(status_code=401, detail="Токен отсутствует")
+            raise HTTPException(status_code=401, detail="Требуется авторизация")
     return token
 
 
