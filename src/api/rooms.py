@@ -20,8 +20,8 @@ async def get_rooms(
         user: UserIdDep,
         db: DBDep,
         hotel_id: int,
-        date_from: date = Query(example="2025-08-01"),
-        date_to: date = Query(example="2025-08-10"),
+        date_from: date = Query(examples="2025-08-01"),
+        date_to: date = Query(examples="2025-08-10"),
 
 ):
     return await db.rooms.get_filtered_by_time(
