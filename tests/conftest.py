@@ -10,7 +10,7 @@ from src.main import app
 from src.models import *
 from src.schemas.hotels import HotelAdd
 from src.schemas.rooms import RoomAdd
-from src.schemas.users import UserRequestAdd
+from src.services.auth import AuthService
 from src.utils.db_manager import DBManager
 
 
@@ -68,3 +68,14 @@ async def register_user(ac, setup_database):
             "password":"1234"
         }
     )
+
+
+@pytest.fixture(autouse=True)
+async def jwt_token(db, register_user):
+    user_id = (await db.users.get_all())[0].id
+    token = AuthService().create_access_token({"user_id": user_id})
+
+    assert token
+    assert isinstance(token, str)
+
+    return token
