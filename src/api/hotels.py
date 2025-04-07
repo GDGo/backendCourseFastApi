@@ -15,7 +15,7 @@ router = APIRouter(
 
 #Параметры запроса
 @router.get("")
-# @cache(expire=10)
+@cache(expire=10)
 async def get_hotels(
         user: UserIdDep,
         db: DBDep,

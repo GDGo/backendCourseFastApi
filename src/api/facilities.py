@@ -12,7 +12,7 @@ router = APIRouter(
 
 
 @router.get("")
-# @cache(expire=10)
+@cache(expire=10)
 async def get_facilities(
         user_id: UserIdDep,
         db: DBDep
