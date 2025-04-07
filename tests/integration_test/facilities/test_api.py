@@ -1,17 +1,15 @@
-async def test_get_facilities(ac, db, jwt_token):
-    response = await ac.get(
+async def test_get_facilities(authenticated_ac, db):
+    response = await authenticated_ac.get(
         "/facilities",
-        headers={"Authorization": jwt_token},
     )
     assert response.status_code == 200
     assert isinstance(response.json(), list)
 
 
-async def test_add_facilities(ac, db, jwt_token):
+async def test_add_facilities(authenticated_ac, db):
     facility_title = "Балкон"
-    response = await ac.post(
+    response = await authenticated_ac.post(
         "/facilities",
-        headers={"Authorization": jwt_token},
         json={
             "title": facility_title
         }
