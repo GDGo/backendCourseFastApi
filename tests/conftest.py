@@ -83,3 +83,18 @@ async def jwt_token(db, register_user):
     assert isinstance(token, str)
 
     return token
+
+
+@pytest.fixture(scope="session", autouse=True)
+async def authenticated_ac(ac, register_user):
+    response = await ac.post(
+        "/auth/login",
+        json={
+            "email": "kot@pes.ru",
+            "password": "1234"
+        }
+    )
+    assert response.status_code == 200
+    token = response.json()["access_token"]
+    assert isinstance(token, str)
+    yield ac
