@@ -2,7 +2,6 @@ from datetime import date
 
 from fastapi import HTTPException
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 
 from src.models.bookings import BookingsOrm
 from src.models.rooms import RoomsOrm
@@ -42,7 +41,7 @@ class BookingsRepository(BaseRepository):
             )
         ).scalars().all()
 
-        if not ids_room:
+        if data.room_id not in ids_room:
             raise HTTPException(404, detail="Нет свободных номеров для бронирования на выбранную дату.")
 
         return await self.add(data)
