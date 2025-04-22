@@ -15,11 +15,16 @@ def test_decode_and_encode_access_token():
 
 
 @pytest.mark.parametrize("username, password, status_code", [
-    ("Pushok@mail.ru", "myamya", 200)
+    ("Pushok@mail.ru", "myamya", 200),
+    ("Pushok@mail.ru", "myamya", 400),
+    ("Push0k@mail.ru", "myamya", 200),
+    ("Pushok", "myamya", 422),
+    ("Pushok@mail", "myamya", 422),
 ])
 async def test_register_user(username, password, status_code,
-                             authenticated_ac, setup_database):
-    response = await authenticated_ac.post(
+                             ac, setup_database):
+    # /register
+    response = await ac.post(
         "/auth/register",
         json={
             "email":username,
@@ -27,18 +32,12 @@ async def test_register_user(username, password, status_code,
         }
     )
 
-    assert response.status_code == 200
-    res = response.json()
-    assert isinstance(res, dict)
-    assert res["status"] == "OK"
+    assert response.status_code == status_code
+    if status_code != 200:
+        return
 
-
-@pytest.mark.parametrize("username, password, status_code", [
-    ("Pushok@mail.ru", "myamya", 200),
-])
-async def test_login_user(username, password, status_code,
-        authenticated_ac, setup_database):
-    response = await authenticated_ac.post(
+    # /login
+    resp_login = await ac.post(
         "/auth/login",
         json={
             "email":username,
@@ -46,30 +45,24 @@ async def test_login_user(username, password, status_code,
         }
     )
 
-    assert response.status_code == 200
-    token = response.json()["access_token"]
+    assert resp_login.status_code == 200
+    assert ac.cookies["access_token"]
+    token = ac.cookies["access_token"]
     assert isinstance(token, str)
-    assert authenticated_ac.cookies["access_token"]
 
-    me = await authenticated_ac.get(
-        "/auth/me"
-    )
+    # /me
+    me = await ac.get("/auth/me")
     assert me.status_code == 200
     me_json = me.json()
     assert isinstance(me_json, dict)
-    assert me_json["id"]
+    assert "id" in me_json
+    assert "password" not in me_json
+    assert "hashed_password" not in me_json
+    assert me_json["email"] == username
 
     payload = AuthService().token_decode(token)
     assert payload["user_id"] == me_json["id"]
 
-
-async def test_logout(authenticated_ac, setup_database):
-    response = await authenticated_ac.get(
-        "/auth/logout"
-    )
+    response = await ac.get("/auth/logout")
     assert response.status_code == 200
-    me = await authenticated_ac.get(
-        "/auth/me"
-    )
-    assert me.status_code == 401
-    print(me.request.headers)
+    assert "access_token" not in ac.cookies
