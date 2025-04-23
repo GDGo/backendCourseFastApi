@@ -1,3 +1,8 @@
+from datetime import date
+
+from fastapi import HTTPException
+
+
 class BaseException(Exception):
     detail = "Неожиданная ошибка"
 
@@ -13,9 +18,28 @@ class AllRoomsAreBookedException(BaseException):
     detail = "Не осталось свободных номеров"
 
 
-class RegisterUserAlreadyExistException(BaseException):
-    detail = "Пользователь с таким email уже существует"
+class ObjectAlreadyExistException(BaseException):
+    detail = "Похожий объект уже существует"
 
 
-class InvalidDatesException(BaseException):
-    detail = "Дата заезда позже даты выезда"
+def check_dates(date_from: date, date_to: date):
+    if date_to <= date_from:
+        raise HTTPException(422, detail="Дата заезда позже даты выезда")
+    
+    
+class BaseHTTPException(HTTPException):
+    status_code = 500
+    detail = None
+
+    def __init__(self):
+        super().__init__(status_code=self.status_code, detail=self.detail)
+
+
+class HotelNotFoundHTTPException(BaseHTTPException):
+    status_code = 404
+    detail = "Отель не найден"
+
+
+class RoomNotFoundHTTPException(BaseHTTPException):
+    status_code = 404
+    detail = "Номер не найден"

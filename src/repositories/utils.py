@@ -2,7 +2,6 @@ from datetime import date
 
 from sqlalchemy import select, func
 
-from src.Exceptions import InvalidDatesException
 from src.models.bookings import BookingsOrm
 from src.models.rooms import RoomsOrm
 
@@ -57,7 +56,3 @@ def rooms_ids_for_booking(
 
         # print(rooms_ids_to_get.compile(bind=engine, compile_kwargs={"literal_binds": True}))
         return rooms_ids_to_get
-
-def check_dates(date_from: date, date_to: date):
-    if date_to <= date_from:
-        raise InvalidDatesException
