@@ -7,3 +7,7 @@ class BaseException(Exception):
 
 class ObjectNotFoundException(BaseException):
     detail = "Объект не найден"
+
+
+class AllRoomsAreBookedException(BaseException):
+    detail = "Не осталось свободных номеров"

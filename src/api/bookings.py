@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Body, HTTPException
 from fastapi_cache.decorator import cache
 
-from src.Exceptions import ObjectNotFoundException
+from src.Exceptions import ObjectNotFoundException, AllRoomsAreBookedException
 from src.api.dependencies import DBDep, UserIdDep
 from src.schemas.bookings import BookingAdd, BookingAddRequest
 
@@ -56,6 +56,9 @@ async def add_booking(
         **booking_data.model_dump(),
         price=room_price
     )
-    booking = await db.bookings.add_booking(_booking_data)
+    try:
+        booking = await db.bookings.add_booking(_booking_data)
+    except AllRoomsAreBookedException as ex:
+        raise HTTPException(409, detail=ex.detail)
     await db.commit()
     return {"status": "OK", "data": booking}
