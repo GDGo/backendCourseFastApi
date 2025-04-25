@@ -1,11 +1,12 @@
+import logging
 from typing import List
 
 from pydantic import BaseModel
 from sqlalchemy import select, insert, delete, update
 from sqlalchemy.exc import NoResultFound, IntegrityError
-from asyncpg.exceptions import UniqueViolationError
+from asyncpg.exceptions import UniqueViolationError, ForeignKeyViolationError
 
-from src.Exceptions import ObjectNotFoundException, ObjectAlreadyExistException
+from src.Exceptions import ObjectNotFoundException, ObjectAlreadyExistException, ObjectNotDelete
 from src.repositories.mappers.base import DataMapper
 
 
@@ -52,10 +53,11 @@ class BaseRepository:
             model = result.scalars().one()
             return self.mapper.map_to_domain_entity(model)
         except IntegrityError as ex:
-            # print(f"{type(ex.orig.__cause__)=}")
+            logging.error(f"Не уалось добавить данные в БД, тип ошибки: {type(ex.orig.__cause__)=}")
             if isinstance(ex.orig.__cause__, UniqueViolationError):
                 raise ObjectAlreadyExistException from ex
             else:
+                logging.error(f"Не знакомая ошибка: тип ошибки {type(ex.orig.__cause__)=}")
                 raise ex
 
     async def add_bulk(self, data: List[BaseModel]):
@@ -77,5 +79,13 @@ class BaseRepository:
         await self.session.execute(update_stmt)
 
     async def delete(self, **filter_by) -> None:
-        delete_stmt = delete(self.model).filter_by(**filter_by)
-        await self.session.execute(delete_stmt)
+        try:
+            delete_stmt = delete(self.model).filter_by(**filter_by)
+            await self.session.execute(delete_stmt)
+        except IntegrityError as ex:
+            logging.error(f"Не удалось удалить данные из БД, тип ошибки: {type(ex.orig.__cause__)=}")
+            if isinstance(ex.orig.__cause__, ForeignKeyViolationError):
+                raise ObjectNotDelete from ex
+            else:
+                logging.error(f"Не знакомая ошибка: тип ошибки {type(ex.orig.__cause__)=}")
+                raise ex

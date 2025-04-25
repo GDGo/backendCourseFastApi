@@ -16,7 +16,7 @@ def test_decode_and_encode_access_token():
 
 @pytest.mark.parametrize("username, password, status_code", [
     ("Pushok@mail.ru", "myamya", 200),
-    ("Pushok@mail.ru", "myamya", 400),
+    ("Pushok@mail.ru", "myamya", 409),
     ("Push0k@mail.ru", "myamya", 200),
     ("Pushok", "myamya", 422),
     ("Pushok@mail", "myamya", 422),

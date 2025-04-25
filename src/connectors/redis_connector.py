@@ -1,3 +1,5 @@
+import logging
+
 import redis.asyncio as redis
 from typing import Optional, Any
 
@@ -10,11 +12,9 @@ class RedisManager:
         self.client: Optional[redis.Redis] = None
 
     async def connect(self) -> None:
+        logging.info(f"Подключение к Redis host={self.host}, port={self.port}")
         self.client = redis.Redis(host=self.host, port=self.port, db=self.db)
-        try:
-            await self.client.ping()  # Проверяем подключение
-        except Exception as e:
-            raise ConnectionError(f"Ошибка подключения к Redis: {e}")
+        logging.info(f"Подключено к Redis host={self.host}, port={str(self.port)}")
 
     async def set(self, key: str, value: Any, expire: int = None) -> bool:
         if not self.client:
@@ -31,23 +31,15 @@ class RedisManager:
         if not self.client:
             raise ConnectionError("Redis не подключен. Вызовите connect() сначала.")
 
-        try:
-            value = await self.client.get(key)
-            return value.decode() if value else None
-        except Exception as e:
-            print(f"Ошибка при получении значения: {e}")
-            return None
+        value = await self.client.get(key)
+        return value.decode() if value else None
 
     async def delete(self, key: str) -> bool:
         if not self.client:
             raise ConnectionError("Redis не подключен. Вызовите connect() сначала.")
 
-        try:
-            deleted = await self.client.delete(key)
-            return deleted > 0
-        except Exception as e:
-            print(f"Ошибка при удалении ключа: {e}")
-            return False
+        deleted = await self.client.delete(key)
+        return deleted > 0
 
     async def close(self) -> None:
         if self.client:
