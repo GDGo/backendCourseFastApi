@@ -6,7 +6,7 @@ from passlib.context import CryptContext
 from fastapi import HTTPException
 
 from src.Exceptions import UserNotExistException, WrongPasswordException, ObjectAlreadyExistException, \
-    UserAlreadyExistException
+    UserAlreadyExistException, TokenExpiredException, WrongTokenException
 from src.config import settings
 from src.database import async_session_maker
 from src.schemas.users import UserRequestAdd, UserAdd
@@ -24,9 +24,9 @@ class AuthService(BaseService):
         user = await self.db.users.get_user_with_hashed_password(email=data.email)
         if not user:
             raise UserNotExistException
-        if not AuthService().verify_password(data.password, user.hashed_password):
+        if not self.verify_password(data.password, user.hashed_password):
             raise WrongPasswordException
-        access_token = AuthService().create_access_token({"user_id": user.id})
+        access_token = self.create_access_token({"user_id": user.id})
         response.set_cookie("access_token", access_token)
         return access_token
 
@@ -41,7 +41,7 @@ class AuthService(BaseService):
             self,
             data: UserRequestAdd
     ):
-        hashed_password = AuthService().hash_password(data.password)
+        hashed_password = self.hash_password(data.password)
         new_user_data = UserAdd(email=data.email, hashed_password=hashed_password)
         try:
             await self.db.users.add(new_user_data)
@@ -73,6 +73,6 @@ class AuthService(BaseService):
         try:
             return jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
         except jwt.exceptions.DecodeError:
-            raise HTTPException(status_code=401, detail="Не верный токен")
+            raise WrongTokenException
         except jwt.exceptions.ExpiredSignatureError:
-            raise HTTPException(status_code=401, detail="Время действия токена закончилось")
+            raise TokenExpiredException

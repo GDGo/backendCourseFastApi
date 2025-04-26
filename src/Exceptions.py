@@ -36,6 +36,15 @@ class UserNotExistException(BaseException):
 class WrongPasswordException(BaseException):
     detail = "Пароль не верный"
 
+class WrongTokenException(BaseException):
+    detail = "Не верный токен"
+
+class TokenExpiredException(BaseException):
+    detail = "Время действия токена закончилось"
+
+class TokenNotSetRequestException(BaseException):
+    detail = "Требуется авторизация"
+
 def check_dates(date_from: date, date_to: date):
     if date_to <= date_from:
         raise HTTPException(422, detail="Дата заезда позже даты выезда")
@@ -71,3 +80,15 @@ class UserNotExistHTTPException(BaseHTTPException):
 class WrongPasswordHTTPException(BaseHTTPException):
     status_code = 409
     detail = "Пароль не верный"
+
+class WrongTokenHTTPException(BaseHTTPException):
+    status_code = 401
+    detail = "Не верный токен"
+
+class TokenExpiredHTTPException(BaseHTTPException):
+    status_code = 401
+    detail = "Время действия токена закончилось"
+
+class TokenNotSetRequestHTTPException(BaseHTTPException):
+    status_code = 401
+    detail = "Требуется авторизация"

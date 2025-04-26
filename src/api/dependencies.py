@@ -3,6 +3,8 @@ from typing import Annotated
 from fastapi import Query, Depends, HTTPException, Request
 from pydantic import BaseModel
 
+from src.Exceptions import WrongTokenHTTPException, WrongTokenException, TokenExpiredException, \
+    TokenNotSetRequestHTTPException
 from src.database import async_session_maker
 from src.services.auth import AuthService
 from src.utils.db_manager import DBManager
@@ -21,12 +23,17 @@ def get_token(request: Request) -> str:
     if not token:
         token = request.headers.get("Authorization")
         if not token:
-            raise HTTPException(status_code=401, detail="Требуется авторизация")
+            raise TokenNotSetRequestHTTPException
     return token
 
 
 def get_current_user_id(token: str = Depends(get_token)) -> int:
-    data = AuthService().token_decode(token)
+    try:
+        data = AuthService().token_decode(token)
+    except WrongTokenException:
+        raise WrongTokenHTTPException
+    except TokenExpiredException:
+        raise WrongTokenHTTPException
     return data.get("user_id")
 
 
