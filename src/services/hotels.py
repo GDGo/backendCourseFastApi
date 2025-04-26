@@ -1,7 +1,6 @@
 from datetime import date
 
-from src.Exceptions import check_dates, ObjectNotDelete, RoomNotFoundException, ObjectNotFoundException, \
-    HotelNotFoundException
+from src.Exceptions import check_dates, ObjectNotFoundException, HotelNotFoundException
 from src.api.dependencies import PaginationDep
 from src.schemas.hotels import HotelAdd
 from src.services.base import BaseService

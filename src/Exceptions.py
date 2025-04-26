@@ -24,8 +24,17 @@ class AllRoomsAreBookedException(BaseException):
 class ObjectAlreadyExistException(BaseException):
     detail = "Похожий объект уже существует"
 
-class ObjectNotDelete(BaseException):
+class ObjectNotDeleteException(BaseException):
     detail = "Объект не может быть удален"
+
+class UserAlreadyExistException(BaseException):
+    detail = "Пользователь с таким email уже зарегистрирован"
+
+class UserNotExistException(BaseException):
+    detail = "Пользователь с таким email не зарегистрирован"
+
+class WrongPasswordException(BaseException):
+    detail = "Пароль не верный"
 
 def check_dates(date_from: date, date_to: date):
     if date_to <= date_from:
@@ -50,3 +59,15 @@ class RoomNotFoundHTTPException(BaseHTTPException):
 class HotelNotDeleteHTTPException(BaseHTTPException):
     status_code = 409
     detail = "Отель не может быть удален"
+
+class UserAlreadyExistHTTPException(BaseHTTPException):
+    status_code = 409
+    detail = "Пользователь с таким email уже зарегистрирован"
+
+class UserNotExistHTTPException(BaseHTTPException):
+    status_code = 404
+    detail = "Пользователь с таким email не зарегистрирован"
+
+class WrongPasswordHTTPException(BaseHTTPException):
+    status_code = 409
+    detail = "Пароль не верный"

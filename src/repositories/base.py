@@ -6,7 +6,7 @@ from sqlalchemy import select, insert, delete, update
 from sqlalchemy.exc import NoResultFound, IntegrityError
 from asyncpg.exceptions import UniqueViolationError, ForeignKeyViolationError
 
-from src.Exceptions import ObjectNotFoundException, ObjectAlreadyExistException, ObjectNotDelete
+from src.Exceptions import ObjectNotFoundException, ObjectAlreadyExistException, ObjectNotDeleteException
 from src.repositories.mappers.base import DataMapper
 
 
@@ -85,7 +85,7 @@ class BaseRepository:
         except IntegrityError as ex:
             logging.error(f"Не удалось удалить данные из БД, тип ошибки: {type(ex.orig.__cause__)=}")
             if isinstance(ex.orig.__cause__, ForeignKeyViolationError):
-                raise ObjectNotDelete from ex
+                raise ObjectNotDeleteException from ex
             else:
                 logging.error(f"Не знакомая ошибка: тип ошибки {type(ex.orig.__cause__)=}")
                 raise ex
