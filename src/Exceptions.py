@@ -92,3 +92,7 @@ class TokenExpiredHTTPException(BaseHTTPException):
 class TokenNotSetRequestHTTPException(BaseHTTPException):
     status_code = 401
     detail = "Требуется авторизация"
+
+class AllRoomsAreBookedHTTPException(BaseHTTPException):
+    status_code = 409
+    detail = "Не осталось свободных номеров"
