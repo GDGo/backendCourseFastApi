@@ -4,7 +4,7 @@ from fastapi import Query, APIRouter, Body, Path
 from fastapi_cache.decorator import cache
 
 from src.Exceptions import ObjectNotFoundException, HotelNotFoundHTTPException, ObjectNotDelete, \
-    HotelNotDeleteHTTPException
+    HotelNotDeleteHTTPException, HotelNotFoundException
 from src.schemas.hotels import HotelAdd, HotelPatch
 from src.api.dependencies import PaginationDep, UserIdDep, DBDep
 from src.services.hotels import HotelService
@@ -95,11 +95,9 @@ async def put_hotel(
         hotel_data: HotelAdd
 ):
     try:
-        await db.hotels.get_one(id=hotel_id)
-    except ObjectNotFoundException:
+        await HotelService(db).edit_hotel(hotel_id, hotel_data)
+    except HotelNotFoundException:
         raise HotelNotFoundHTTPException
-
-    await HotelService(db).edit_hotel(hotel_id, hotel_data)
     return {"Status": "OK"}
 
 
@@ -111,11 +109,9 @@ async def patch_hotel(
         hotel_data: HotelPatch,
 ):
     try:
-        await db.hotels.get_one(id=hotel_id)
-    except ObjectNotFoundException:
+        await HotelService(db).partionally_edit(hotel_id, hotel_data)
+    except HotelNotFoundException:
         raise HotelNotFoundHTTPException
-
-    await HotelService(db).partionally_edit(hotel_id, hotel_data)
     return {"Status": "OK"}
 
 
@@ -126,12 +122,9 @@ async def delete_hotel(
         hotel_id: int
 ):
     try:
-        await db.hotels.get_one(id=hotel_id)
-    except ObjectNotFoundException:
-        raise HotelNotFoundHTTPException
-
-    try:
         await HotelService(db).delete_hotel(hotel_id)
     except ObjectNotDelete as ex:
         raise HotelNotDeleteHTTPException
+    except HotelNotFoundException:
+        raise HotelNotFoundHTTPException
     return {"status": "OK"}

@@ -9,14 +9,17 @@ class BaseException(Exception):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-
 class ObjectNotFoundException(BaseException):
     detail = "Объект не найден"
 
+class RoomNotFoundException(ObjectNotFoundException):
+    detail = "Номер не найден"
+
+class HotelNotFoundException(ObjectNotFoundException):
+    detail = "Отель не найден"
 
 class AllRoomsAreBookedException(BaseException):
     detail = "Не осталось свободных номеров"
-
 
 class ObjectAlreadyExistException(BaseException):
     detail = "Похожий объект уже существует"
@@ -27,8 +30,7 @@ class ObjectNotDelete(BaseException):
 def check_dates(date_from: date, date_to: date):
     if date_to <= date_from:
         raise HTTPException(422, detail="Дата заезда позже даты выезда")
-    
-    
+
 class BaseHTTPException(HTTPException):
     status_code = 500
     detail = None
@@ -40,7 +42,6 @@ class BaseHTTPException(HTTPException):
 class HotelNotFoundHTTPException(BaseHTTPException):
     status_code = 404
     detail = "Отель не найден"
-
 
 class RoomNotFoundHTTPException(BaseHTTPException):
     status_code = 404

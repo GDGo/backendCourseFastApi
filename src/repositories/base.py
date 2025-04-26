@@ -53,7 +53,7 @@ class BaseRepository:
             model = result.scalars().one()
             return self.mapper.map_to_domain_entity(model)
         except IntegrityError as ex:
-            logging.error(f"Не уалось добавить данные в БД, тип ошибки: {type(ex.orig.__cause__)=}")
+            logging.error(f"Не удалось добавить данные в БД, тип ошибки: {type(ex.orig.__cause__)=}")
             if isinstance(ex.orig.__cause__, UniqueViolationError):
                 raise ObjectAlreadyExistException from ex
             else:
