@@ -11,7 +11,7 @@ from src.utils.db_manager import DBManager
 def compress_and_save_image(input_image_path: str) -> None:
     if not os.path.exists(input_image_path):
         raise FileNotFoundError(f"Файл {input_image_path} не найден!")
-    output_folder: str = "src\static\images"
+    output_folder: str = "/app/src/static/images"
 
     # Открываем изображение
     with Image.open(input_image_path) as img:

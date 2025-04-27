@@ -8,9 +8,7 @@ class FacilitiesService(BaseService):
     async def get_facilities(self):
         return await self.db.facilities.get_all()
 
-    async def add_facilities(
-            self,
-            facility_data: FacilityAdd = Body(openapi_examples={
+    async def add_facilities(self, facility_data: FacilityAdd = Body(openapi_examples={
                 "1": {"summary": "Сплит-система", "value": {
                     "title": "Сплит-система"
                 }},
@@ -23,8 +21,7 @@ class FacilitiesService(BaseService):
                 "4": {"summary": "Телевизор", "value": {
                     "title": "Телевизор"
                 }},
-            }
-            )):
+            })):
         facility = await self.db.facilities.add(facility_data)
         await self.db.commit()
         return facility
