@@ -1,10 +1,19 @@
 services:
+
+  booking_cache:
+    image: redis:7.4
+    container_name: booking_cache
+    ports:
+      - "7379:6379"
+    networks:
+      - myNetwork
+
   booking_back_service:
     container_name: 'booking_back'
     build:
       context: .
     ports:
-      - "7777:8001"
+      - "8001:8001"
     networks:
       - myNetwork
     env_file:
