@@ -17,7 +17,9 @@ router = APIRouter(
 
 
 #Параметры запроса
-@router.get("")
+@router.get("",
+            name="Доступные отели",
+            description="Все доступные отели в которых есть свободные номера на определенную дату")
 @cache(expire=10)
 async def get_hotels(
         user: UserIdDep,
@@ -38,7 +40,8 @@ async def get_hotels(
     return {"status": "OK", "data": hotels}
 
 
-@router.get("/{hotel_id}")
+@router.get("/{hotel_id}",
+            name="Получить отель")
 @cache(expire=10)
 async def get_hotel(
         user: UserIdDep,
@@ -52,7 +55,8 @@ async def get_hotel(
         raise HotelNotFoundHTTPException
 
 #Параметр пути
-@router.post("")
+@router.post("",
+            name="Добавить отель")
 async def add_hotel(
         user: UserIdDep,
         db: DBDep,
@@ -87,7 +91,8 @@ async def add_hotel(
     return {"Status": "OK", "data": new_hotel}
 
 
-@router.put("/{hotel_id}")
+@router.put("/{hotel_id}",
+            name="Полное изменение отеля")
 async def put_hotel(
         user: UserIdDep,
         db: DBDep,
@@ -101,7 +106,8 @@ async def put_hotel(
     return {"Status": "OK"}
 
 
-@router.patch("/{hotel_id}")
+@router.patch("/{hotel_id}",
+            name="Частичное изменение отеля")
 async def patch_hotel(
         user: UserIdDep,
         db: DBDep,
@@ -115,7 +121,8 @@ async def patch_hotel(
     return {"Status": "OK"}
 
 
-@router.delete("/{hotel_id}")
+@router.delete("/{hotel_id}",
+            name="Удаление отеля")
 async def delete_hotel(
         user: UserIdDep,
         db: DBDep,
@@ -123,7 +130,7 @@ async def delete_hotel(
 ):
     try:
         await HotelService(db).delete_hotel(hotel_id)
-    except ObjectNotDelete as ex:
+    except ObjectNotDeleteException as ex:
         raise HotelNotDeleteHTTPException
     except HotelNotFoundException:
         raise HotelNotFoundHTTPException

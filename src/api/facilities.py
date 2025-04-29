@@ -12,7 +12,7 @@ router = APIRouter(
 )
 
 
-@router.get("")
+@router.get("", name="Доступные удобства")
 @cache(expire=10)
 async def get_facilities(
         user_id: UserIdDep,
@@ -21,7 +21,7 @@ async def get_facilities(
     return await FacilitiesService(db).get_facilities()
 
 
-@router.post("")
+@router.post("", name="Добавить удобства")
 async def add_facilities(
         user_id: UserIdDep,
         db: DBDep,

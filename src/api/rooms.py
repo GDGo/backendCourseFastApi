@@ -15,7 +15,9 @@ router: APIRouter = APIRouter(
 )
 
 
-@router.get("/{hotel_id}/rooms")
+@router.get("/{hotel_id}/rooms",
+            name="Получить номера",
+            description="Все доступные номера в отеле на определенную дату")
 @cache(expire=10)
 async def get_rooms(
         user: UserIdDep,
@@ -36,7 +38,8 @@ async def get_rooms(
     return {"status": "OK", "data": rooms}
 
 
-@router.get("/{hotel_id}/rooms/{room_id}")
+@router.get("/{hotel_id}/rooms/{room_id}",
+            name="Получить один номер")
 @cache(expire=10)
 async def get_room(
         user: UserIdDep,
@@ -55,7 +58,8 @@ async def get_room(
         raise RoomNotFoundHTTPException
 
 
-@router.post("/{hotel_id}/rooms")
+@router.post("/{hotel_id}/rooms",
+             name="Добавить номер")
 async def add_rooms(
         user: UserIdDep,
         db: DBDep,
@@ -91,7 +95,8 @@ async def add_rooms(
     return {"status": "OK", "data": room}
 
 
-@router.put("/{hotel_id}/rooms/{room_id}")
+@router.put("/{hotel_id}/rooms/{room_id}",
+            name="Полное обновление номера")
 async def put_room(
         user: UserIdDep,
         db: DBDep,
@@ -108,7 +113,8 @@ async def put_room(
     return {"status": "OK"}
 
 
-@router.patch("/{hotel_id}/rooms/{room_id}")
+@router.patch("/{hotel_id}/rooms/{room_id}",
+              name="Частичное изменение номера")
 async def patch_room(
         user: UserIdDep,
         db: DBDep,
@@ -125,7 +131,8 @@ async def patch_room(
     return {"status": "OK"}
 
 
-@router.delete("/{hotel_id}/rooms/{room_id}")
+@router.delete("/{hotel_id}/rooms/{room_id}",
+               name="Удалить номер")
 async def delete_room(
         user: UserIdDep,
         db: DBDep,

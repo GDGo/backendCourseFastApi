@@ -27,8 +27,26 @@ async def lifespan(app=FastAPI):
     yield
     await redis_manager.close()
 
+description = """
+booking-hotel API helps you do awesome stuff. 🚀
 
-app = FastAPI(lifespan=lifespan)
+* Регистрации и аутентификации пользователей.
+* Бронирование отелей и номеров.
+* Изменение отелей и номеров
+* Добавление удобств
+* Получение всех бронирований
+* Получение только собственных бронирований
+* Загрузка изображений
+"""
+
+app = FastAPI(title="API для сервиса бронирования отелей и номеров",
+              version="1.0.0",
+              contact={
+                  "name": "Dmitry Goncharov",
+                  "email": "dimnagoncharov21@gmail.com",
+              },
+              description=description,
+              lifespan=lifespan)
 
 app.include_router(router_users)
 app.include_router(router_hotels)

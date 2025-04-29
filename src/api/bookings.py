@@ -14,7 +14,9 @@ router = APIRouter(
 )
 
 
-@router.get("")
+@router.get("",
+            name="Все бронирования",
+            description="Бронирования всех пользователей, для просмотра не требуется аутентификация")
 @cache(expire=10)
 async def get_all_bookings(
         db: DBDep,
@@ -22,7 +24,9 @@ async def get_all_bookings(
     return await BookingService(db).get_all_bookings()
 
 
-@router.get("/me")
+@router.get("/me",
+            name="Мои бронирования",
+            description="Бронирования только текущего пользователя")
 @cache(expire=10)
 async def get_my_bookings(
         user_id: UserIdDep,
@@ -31,7 +35,7 @@ async def get_my_bookings(
     return await BookingService(db).get_my_bookings(user_id=user_id)
 
 
-@router.post("")
+@router.post("", name="Добавить бронирование")
 async def add_booking(
         user_id: UserIdDep,
         db: DBDep,

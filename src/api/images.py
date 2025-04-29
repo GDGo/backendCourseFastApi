@@ -13,7 +13,7 @@ router = APIRouter(
 )
 
 
-@router.post("")
+@router.post("", name="Загрузка фотографии")
 def upload_file(
         file: UploadFile,
         user_id: UserIdDep
