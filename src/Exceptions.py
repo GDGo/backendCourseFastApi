@@ -21,11 +21,17 @@ class HotelNotFoundException(ObjectNotFoundException):
 class AllRoomsAreBookedException(BaseException):
     detail = "Не осталось свободных номеров"
 
+class ObjectNotCreatedException(BaseException):
+    detail = "Объект не может быть создан"
+
 class ObjectAlreadyExistException(BaseException):
     detail = "Похожий объект уже существует"
 
 class ObjectNotDeleteException(BaseException):
     detail = "Объект не может быть удален"
+
+class ObjectNotUpdateException(BaseException):
+    detail = "Объект не может быть изменен"
 
 class UserAlreadyExistException(BaseException):
     detail = "Пользователь с таким email уже зарегистрирован"
@@ -44,6 +50,21 @@ class TokenExpiredException(BaseException):
 
 class TokenNotSetRequestException(BaseException):
     detail = "Требуется авторизация"
+
+class UserAlreadyAuthorizeException(BaseException):
+    detail = "Пользователь уже авторизован, не надо часто жмякать....попробуй попозже."
+
+class UserAlreadyLogoutException(BaseException):
+    detail = "Ты уже вышел из системы. Узбогойся :)"
+
+class PasswordNotEmptyException(BaseException):
+    detail = "Пароль не может быть пустым"
+
+class PasswordNotEnogthLengthException(BaseException):
+    detail = "Минимальная длина пароля 8 символов"
+
+class FacilityAddBulkException(BaseException):
+    detail = "Не удалось добавить удобства при создании номера"
 
 def check_dates(date_from: date, date_to: date):
     if date_to <= date_from:
@@ -65,6 +86,10 @@ class RoomNotFoundHTTPException(BaseHTTPException):
     status_code = 404
     detail = "Номер не найден"
 
+class RoomNotDeleteHTTPException(BaseHTTPException):
+    status_code = 409
+    detail = "Номер не может быть удален"
+
 class HotelNotDeleteHTTPException(BaseHTTPException):
     status_code = 409
     detail = "Отель не может быть удален"
@@ -72,6 +97,18 @@ class HotelNotDeleteHTTPException(BaseHTTPException):
 class UserAlreadyExistHTTPException(BaseHTTPException):
     status_code = 409
     detail = "Пользователь с таким email уже зарегистрирован"
+
+class HotelAlreadyExistHTTPException(BaseHTTPException):
+    status_code = 409
+    detail = "Отель уже существует"
+
+class RoomAlreadyExistHTTPException(BaseHTTPException):
+    status_code = 409
+    detail = "Номер с такими характеристиками уже существует"
+
+class FacilityAlreadyExistHTTPException(BaseHTTPException):
+    status_code = 409
+    detail = "Удобство уже существует"
 
 class UserNotExistHTTPException(BaseHTTPException):
     status_code = 404
@@ -96,3 +133,35 @@ class TokenNotSetRequestHTTPException(BaseHTTPException):
 class AllRoomsAreBookedHTTPException(BaseHTTPException):
     status_code = 409
     detail = "Не осталось свободных номеров"
+
+class UserAlreadyAuthorizeHTTPException(BaseHTTPException):
+    status_code = 409
+    detail = "Ты уже авторизован. Узбагойся :)"
+
+class UserAlreadyLogoutHTTPException(BaseHTTPException):
+    status_code = 409
+    detail = "Ты уже вышел из системы. Узбогойся :)"
+
+class PasswordNotEmptyHTTPException(BaseHTTPException):
+    status_code = 422
+    detail = "Пароль не может быть пустым"
+
+class PasswordNotEnogthLengthHTTPException(BaseHTTPException):
+    status_code = 422
+    detail = "Минимальная длина пароля 8 символов"
+
+class HotelNotUpdateHTTPException(BaseHTTPException):
+    status_code = 409
+    detail = "Отель не может быть изменен, проверьте передаваемые значения"
+
+class HotelNotCreatedHTTPException(BaseHTTPException):
+    status_code = 409
+    detail = "Отель не может быть создан без названия и его расположения"
+
+class FileNotFoundErrorHTTPException(BaseHTTPException):
+    status_code = 404
+    detail = "Файл не найден"
+
+class FacilityAddBulkHTTPException(BaseHTTPException):
+    status_code = 409
+    detail = "Не удалось добавить удобства при создании номера, проверьте id добавляемых удобств"

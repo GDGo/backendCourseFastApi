@@ -1,6 +1,10 @@
 from datetime import date
 
-from src.Exceptions import check_dates, ObjectNotFoundException, RoomNotFoundException
+from asyncpg import ForeignKeyViolationError
+from sqlalchemy.exc import IntegrityError
+import logging
+
+from src.Exceptions import check_dates, ObjectNotFoundException, RoomNotFoundException, ObjectNotCreatedException
 from src.schemas.facilities import RoomFacilityAdd
 from src.schemas.rooms import RoomAddRequest, RoomAdd, RoomPatchRequest, RoomPatch
 from src.services.base import BaseService
@@ -39,8 +43,17 @@ class RoomService(BaseService):
         rooms_facilities_data = [RoomFacilityAdd(room_id=room.id, facility_id=f_id) for f_id in
                                  room_data.facilities_ids]
         if rooms_facilities_data:
-            await self.db.rooms_facilities.add_bulk(rooms_facilities_data)
+            try:
+                await self.db.rooms_facilities.add_bulk(rooms_facilities_data)
+            except IntegrityError as ex:
+                logging.error(f"Не удалось добавить данные в БД, тип ошибки: {type(ex.orig.__cause__)=}")
+                if isinstance(ex.orig.__cause__, ForeignKeyViolationError):
+                    raise ObjectNotCreatedException from ex
+                else:
+                    logging.error(f"Не знакомая ошибка: тип ошибки {type(ex.orig.__cause__)=}")
+                    raise ex
         await self.db.commit()
+        return room
 
     async def put_room(
             self,

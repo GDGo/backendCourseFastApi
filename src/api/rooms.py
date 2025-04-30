@@ -4,7 +4,8 @@ from fastapi import APIRouter, Body, Query
 from fastapi_cache.decorator import cache
 
 from src.Exceptions import ObjectNotFoundException, HotelNotFoundHTTPException, RoomNotFoundHTTPException, \
-    RoomNotFoundException, HotelNotFoundException
+    RoomNotFoundException, HotelNotFoundException, RoomAlreadyExistHTTPException, ObjectAlreadyExistException, \
+    ObjectNotDeleteException, RoomNotDeleteHTTPException, ObjectNotCreatedException, FacilityAddBulkHTTPException
 from src.api.dependencies import UserIdDep, DBDep
 from src.schemas.rooms import RoomAddRequest, RoomPatchRequest
 from src.services.rooms import RoomService
@@ -92,6 +93,10 @@ async def add_rooms(
         room = await RoomService(db).create_room(hotel_id=hotel_id, room_data=room_data)
     except HotelNotFoundException:
         raise HotelNotFoundHTTPException
+    except ObjectAlreadyExistException:
+        raise RoomAlreadyExistHTTPException
+    except ObjectNotCreatedException:
+        raise FacilityAddBulkHTTPException
     return {"status": "OK", "data": room}
 
 
@@ -145,4 +150,6 @@ async def delete_room(
         raise HotelNotFoundHTTPException
     except RoomNotFoundException:
         raise RoomNotFoundHTTPException
+    except ObjectNotDeleteException as ex:
+        raise RoomNotDeleteHTTPException
     return {"status": "OK"}

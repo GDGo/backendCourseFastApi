@@ -3,10 +3,11 @@ from typing import List
 
 from pydantic import BaseModel
 from sqlalchemy import select, insert, delete, update
-from sqlalchemy.exc import NoResultFound, IntegrityError
-from asyncpg.exceptions import UniqueViolationError, ForeignKeyViolationError
+from sqlalchemy.exc import NoResultFound, IntegrityError, ProgrammingError
+from asyncpg.exceptions import UniqueViolationError, ForeignKeyViolationError, PostgresSyntaxError
 
-from src.Exceptions import ObjectNotFoundException, ObjectAlreadyExistException, ObjectNotDeleteException
+from src.Exceptions import ObjectNotFoundException, ObjectAlreadyExistException, ObjectNotDeleteException, \
+    ObjectNotUpdateException
 from src.repositories.mappers.base import DataMapper
 
 
@@ -46,8 +47,12 @@ class BaseRepository:
             raise ObjectNotFoundException
         return self.mapper.map_to_domain_entity(model)
 
-    async def add(self, data: BaseModel):
+    async def add(self, data: BaseModel, unique_value=True):
         try:
+            if unique_value:
+                obj = await self.get_one_or_none(**data.model_dump())
+                if obj:
+                    raise ObjectAlreadyExistException
             add_data_stmt = (insert(self.model).values(**data.model_dump()).returning(self.model))
             result = await self.session.execute(add_data_stmt)
             model = result.scalars().one()
@@ -71,12 +76,20 @@ class BaseRepository:
                    data: BaseModel,
                    exclude_unset: bool = False,
                    **filter_by) -> None:
-        update_stmt = (
-            update(self.model)
-            .filter_by(**filter_by)
-            .values(**data.model_dump(exclude_unset=exclude_unset))
-        )
-        await self.session.execute(update_stmt)
+        try:
+            update_stmt = (
+                update(self.model)
+                .filter_by(**filter_by)
+                .values(**data.model_dump(exclude_unset=exclude_unset))
+            )
+            await self.session.execute(update_stmt)
+        except ProgrammingError as ex:
+            logging.error(f"Не удалось изменить данные в БД, тип ошибки: {type(ex.orig.__cause__)=}")
+            if isinstance(ex.orig.__cause__, PostgresSyntaxError):
+                raise ObjectNotUpdateException from ex
+            else:
+                logging.error(f"Не знакомая ошибка: тип ошибки {type(ex.orig.__cause__)=}")
+                raise ex
 
     async def delete(self, **filter_by) -> None:
         try:

@@ -1,6 +1,6 @@
 from datetime import date
 
-from src.Exceptions import check_dates, ObjectNotFoundException, HotelNotFoundException
+from src.Exceptions import check_dates, ObjectNotFoundException, HotelNotFoundException, ObjectNotCreatedException
 from src.api.dependencies import PaginationDep
 from src.schemas.hotels import HotelAdd
 from src.services.base import BaseService
@@ -30,6 +30,8 @@ class HotelService(BaseService):
         return await self.db.hotels.get_one(id=hotel_id)
 
     async def create_hotel(self, hotel_data: HotelAdd):
+        if not hotel_data.title or not hotel_data.location:
+            raise ObjectNotCreatedException
         hotel = await self.db.hotels.add(hotel_data)
         await self.db.commit()
         return hotel

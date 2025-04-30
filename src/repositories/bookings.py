@@ -44,4 +44,4 @@ class BookingsRepository(BaseRepository):
         if data.room_id not in ids_room:
             raise AllRoomsAreBookedException
 
-        return await self.add(data)
+        return await self.add(data, unique_value=False)

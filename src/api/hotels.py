@@ -4,7 +4,8 @@ from fastapi import Query, APIRouter, Body, Path
 from fastapi_cache.decorator import cache
 
 from src.Exceptions import ObjectNotFoundException, HotelNotFoundHTTPException, ObjectNotDeleteException, \
-    HotelNotDeleteHTTPException, HotelNotFoundException
+    HotelNotDeleteHTTPException, HotelNotFoundException, ObjectNotUpdateException, HotelNotUpdateHTTPException, \
+    ObjectNotCreatedException, HotelNotCreatedHTTPException, ObjectAlreadyExistException, HotelAlreadyExistHTTPException
 from src.schemas.hotels import HotelAdd, HotelPatch
 from src.api.dependencies import PaginationDep, UserIdDep, DBDep
 from src.services.hotels import HotelService
@@ -87,8 +88,13 @@ async def add_hotel(
     }},
     })
 ):
-    new_hotel = await HotelService(db).create_hotel(hotel_data)
-    return {"Status": "OK", "data": new_hotel}
+    try:
+        new_hotel = await HotelService(db).create_hotel(hotel_data)
+        return {"Status": "OK", "data": new_hotel}
+    except ObjectNotCreatedException:
+        raise HotelNotCreatedHTTPException
+    except ObjectAlreadyExistException:
+        raise HotelAlreadyExistHTTPException
 
 
 @router.put("/{hotel_id}",
@@ -118,6 +124,8 @@ async def patch_hotel(
         await HotelService(db).partionally_edit(hotel_id, hotel_data)
     except HotelNotFoundException:
         raise HotelNotFoundHTTPException
+    except ObjectNotUpdateException:
+        raise HotelNotUpdateHTTPException
     return {"Status": "OK"}
 
 

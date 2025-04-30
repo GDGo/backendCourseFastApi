@@ -28,7 +28,7 @@ async def lifespan(app=FastAPI):
     await redis_manager.close()
 
 description = """
-booking-hotel API helps you do awesome stuff. 🚀
+booking-hotel API helps you do awesome stuf. 🚀
 
 * Регистрации и аутентификации пользователей.
 * Бронирование отелей и номеров.
