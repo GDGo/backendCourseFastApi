@@ -11,11 +11,11 @@ from src.api.dependencies import get_db
 from src.config import settings
 from src.database import Base, engine_null_pool, async_session_maker_null_pool
 from src.main import app
-from src.models import *
+from src.models import *  # noqa
 from src.schemas.hotels import HotelAdd
 from src.schemas.rooms import RoomAdd
 from src.services.auth import AuthService
-from src.utils.db_manager import DBManager
+from src.utils.db_manager import DBManager # noqa
 
 
 @pytest.fixture(scope="session", autouse=True)
